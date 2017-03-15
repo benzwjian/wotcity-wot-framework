@@ -19,11 +19,19 @@
     "bluebird": "^3.3.3",
     "cluster": "^0.7.7",
     "coap": "^0.10.3",
+    "concurrently": "^3.4.0",
     "lwm2m-node-lib": "^0.4.1",
     "underscore": "^1.8.3",
     "utils-merge": "^1.0.0",
     "websocket": "^1.0.17"
   },
-  "devDependencies": {},
+  "scripts": {
+    "test": "mocha ./tests/suits/",
+    "start": "concurrently \"node ./servers/coap-broker.js\" \"node ./servers/websocket-broker.js\" \"export PORT=8001; node ./servers/coap-proxy-websocket.js\" \"export PORT=8001; node ./servers/websocket-proxy-coap.js\" "
+  },
+  "devDependencies": {
+    "concurrently": "^3.4.0",
+    "mocha": "^2.4.5"
+  },
   "license": "MIT License"
 }
