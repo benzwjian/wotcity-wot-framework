@@ -5,7 +5,7 @@ var WebsocketClient = require('websocket').client;
 describe('CoAP Broker', function(){
 	var res = '';
 
-	beforeEach(function(done) {
+	before(function(done) {
 		var viewer = coap.request({
 			'hostname': '127.0.0.1',
 			'port': 8000,
@@ -30,8 +30,9 @@ describe('CoAP Broker', function(){
 
 describe('Websocket Broker', function(){
 	var res = '';
+	var viewerConn, senderConn;
 
-	beforeEach(function(done) {
+	before(function(done) {
 		var viewer = new WebsocketClient();
 
 		viewer.on('connect', function(connection) {
@@ -41,6 +42,7 @@ describe('Websocket Broker', function(){
 		            done();
 		        }
 		    });
+		    viewerConn = connection;
 		});
 
 		viewer.connect('ws://127.0.0.1:8000/object/5550937980d51931b3000009/viewer', '');
@@ -48,10 +50,16 @@ describe('Websocket Broker', function(){
 		var sender = new WebsocketClient();
 
 		sender.on('connect', function(conn) {
+			senderConn = conn;
 			conn.sendUTF(JSON.stringify({foo: 'bar'}));
 		});
 
 		sender.connect('ws://localhost:8000/object/5550937980d51931b3000009/send', '');
+	});
+
+	after(function() {
+		viewerConn.drop();
+		senderConn.drop();
 	});
 
     it('should pass', function () {
