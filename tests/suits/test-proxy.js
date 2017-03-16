@@ -1,4 +1,5 @@
 var assert = require('assert');
+var expect = require('chai').expect;
 var coap = require('coap');
 var WebsocketClient = require('websocket').client;
 
@@ -15,10 +16,11 @@ describe('CoAP Proxy Websocket', function(){
 		    connection.on('message', function(message) {
 		        if (message.type === 'utf8') {
 		            res = message.utf8Data;
-		            setTimeout(done, 3000);
+		            done();
 		        }
 		    });
 
+		    // this data will be persisted at first send
 		    var sender = coap.request('coap://127.0.0.1:8001/object/5550937980d51931b3000009/send');
 			sender.end(new Buffer(JSON.stringify({foo: 'bar'})));
 
@@ -37,7 +39,8 @@ describe('CoAP Proxy Websocket', function(){
 	});
 
     it('should pass', function () {
-        assert.equal(res, JSON.stringify({foo: 'bar'})+JSON.stringify({foo: 'bar'}));
+    	// also assert persisted data case
+    	expect(res).to.be.oneOf([JSON.stringify({foo: 'bar'})+JSON.stringify({foo: 'bar'}), JSON.stringify({foo: 'bar'})]);
     });
 
 });
